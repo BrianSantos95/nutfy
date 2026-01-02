@@ -12,6 +12,7 @@ import { Success } from './pages/Success';
 import { Profile } from './pages/Profile';
 import { SubscriptionPage } from './pages/SubscriptionPage';
 import { MonthlyReport } from './pages/MonthlyReport';
+import { AdminPanel } from './pages/AdminPanel';
 import { AIChat } from './pages/AIChat';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
@@ -97,6 +98,7 @@ const App: React.FC = () => {
                         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                         <Route path="/reports" element={<ProtectedRoute><MonthlyReport /></ProtectedRoute>} />
                         <Route path="/chat" element={<ProtectedRoute><AIChat /></ProtectedRoute>} />
+                        <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
 
                         {/* Student Management */}
                         <Route path="/student/new" element={<ProtectedRoute><StudentForm /></ProtectedRoute>} />
