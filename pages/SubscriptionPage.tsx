@@ -32,7 +32,7 @@ export const SubscriptionPage: React.FC = () => {
         if (selectedPlan === 'monthly') {
             checkoutUrl = 'https://pay.kiwify.com.br/ZzvoVtk';
         } else {
-            checkoutUrl = 'https://pay.kiwify.com.br/MkpaEHM';
+            checkoutUrl = 'https://pay.kiwify.com.br/OL8HAmP';
         }
 
         // Abre o checkout em nova aba
