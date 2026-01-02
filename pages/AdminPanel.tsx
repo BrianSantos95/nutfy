@@ -36,9 +36,9 @@ export const AdminPanel: React.FC = () => {
             setLoading(true);
             const data = await adminService.getDashboardData();
             setUsers(data);
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            showNotification('Erro ao carregar dados administrativos.', 'error');
+            showNotification(`Erro: ${error.message || error.error_description || 'Falha ao carregar dados'}`, 'error');
         } finally {
             setLoading(false);
         }
