@@ -17,6 +17,7 @@ import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { ResetPassword } from './pages/ResetPassword';
 import { subscriptionService } from './services/subscriptionService';
+import { NotificationProvider } from './contexts/NotificationContext';
 import { Lock, Loader2 } from 'lucide-react';
 
 // Protege rotas verificando LOGIN e ASSINATURA
@@ -43,7 +44,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
             check();
         }
     }, [user, loading]);
-    
+
     if (loading || checkingSub) {
         return (
             <div className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -80,46 +81,48 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 };
 
 const App: React.FC = () => {
-  return (
-    <AuthProvider>
-        <HashRouter>
-        <Routes>
-            {/* Rotas Públicas */}
-            <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-            <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            
-            {/* Rotas Privadas */}
-            <Route path="/subscription" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
-            <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="/reports" element={<ProtectedRoute><MonthlyReport /></ProtectedRoute>} />
-            <Route path="/chat" element={<ProtectedRoute><AIChat /></ProtectedRoute>} />
-            
-            {/* Student Management */}
-            <Route path="/student/new" element={<ProtectedRoute><StudentForm /></ProtectedRoute>} />
-            <Route path="/student/:id/edit" element={<ProtectedRoute><StudentForm /></ProtectedRoute>} />
-            
-            {/* Hub / History of Assessments */}
-            <Route path="/student/:studentId/progress" element={<ProtectedRoute><PatientProgress /></ProtectedRoute>} />
-            
-            {/* Assessment Management */}
-            <Route path="/student/:studentId/assessment/new" element={<ProtectedRoute><AssessmentForm /></ProtectedRoute>} />
-            <Route path="/student/:studentId/assessment/:assessmentId/edit" element={<ProtectedRoute><AssessmentForm /></ProtectedRoute>} />
-            
-            {/* Meals linked to Assessment */}
-            <Route path="/student/:studentId/assessment/:assessmentId/meals" element={<ProtectedRoute><MealManager /></ProtectedRoute>} />
-            <Route path="/student/:studentId/assessment/:assessmentId/meal/new" element={<ProtectedRoute><MealForm /></ProtectedRoute>} />
-            <Route path="/student/:studentId/assessment/:assessmentId/meal/:mealId" element={<ProtectedRoute><MealForm /></ProtectedRoute>} />
-            
-            <Route path="/student/:studentId/assessment/:assessmentId/preview" element={<ProtectedRoute><PlanPreview /></ProtectedRoute>} />
-            <Route path="/student/:studentId/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
+    return (
+        <AuthProvider>
+            <NotificationProvider>
+                <HashRouter>
+                    <Routes>
+                        {/* ... as rotas existentes ... */}
+                        <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+                        <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+                        <Route path="/reset-password" element={<ResetPassword />} />
 
-            <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-        </HashRouter>
-    </AuthProvider>
-  );
+                        {/* Rotas Privadas */}
+                        <Route path="/subscription" element={<ProtectedRoute><SubscriptionPage /></ProtectedRoute>} />
+                        <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                        <Route path="/reports" element={<ProtectedRoute><MonthlyReport /></ProtectedRoute>} />
+                        <Route path="/chat" element={<ProtectedRoute><AIChat /></ProtectedRoute>} />
+
+                        {/* Student Management */}
+                        <Route path="/student/new" element={<ProtectedRoute><StudentForm /></ProtectedRoute>} />
+                        <Route path="/student/:id/edit" element={<ProtectedRoute><StudentForm /></ProtectedRoute>} />
+
+                        {/* Hub / History of Assessments */}
+                        <Route path="/student/:studentId/progress" element={<ProtectedRoute><PatientProgress /></ProtectedRoute>} />
+
+                        {/* Assessment Management */}
+                        <Route path="/student/:studentId/assessment/new" element={<ProtectedRoute><AssessmentForm /></ProtectedRoute>} />
+                        <Route path="/student/:studentId/assessment/:assessmentId/edit" element={<ProtectedRoute><AssessmentForm /></ProtectedRoute>} />
+
+                        {/* Meals linked to Assessment */}
+                        <Route path="/student/:studentId/assessment/:assessmentId/meals" element={<ProtectedRoute><MealManager /></ProtectedRoute>} />
+                        <Route path="/student/:studentId/assessment/:assessmentId/meal/new" element={<ProtectedRoute><MealForm /></ProtectedRoute>} />
+                        <Route path="/student/:studentId/assessment/:assessmentId/meal/:mealId" element={<ProtectedRoute><MealForm /></ProtectedRoute>} />
+
+                        <Route path="/student/:studentId/assessment/:assessmentId/preview" element={<ProtectedRoute><PlanPreview /></ProtectedRoute>} />
+                        <Route path="/student/:studentId/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
+
+                        <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                </HashRouter>
+            </NotificationProvider>
+        </AuthProvider>
+    );
 };
 
 export default App;

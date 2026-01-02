@@ -3,6 +3,7 @@ import { Layout } from '../components/Layout';
 import { User, Award, Hash, Save, Upload, Loader2 } from 'lucide-react';
 import { storageService } from '../services/storageService';
 import { ProfessionalProfile } from '../types';
+import { useNotification } from '../contexts/NotificationContext';
 
 export const Profile: React.FC = () => {
   const [profile, setProfile] = useState<ProfessionalProfile>({
@@ -14,6 +15,7 @@ export const Profile: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     storageService.getProfile().then(savedProfile => {
@@ -32,7 +34,7 @@ export const Profile: React.FC = () => {
         const url = await storageService.fileToBase64(file);
         setProfile(prev => ({ ...prev, logoUrl: url }));
       } catch (err) {
-        alert('Erro ao carregar imagem');
+        showNotification('Erro ao carregar imagem', 'error');
       } finally {
         setSaving(false);
       }
@@ -42,30 +44,31 @@ export const Profile: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile.name.trim()) {
-      alert('O Nome Profissional é obrigatório para gerar os planos.');
+      showNotification('O Nome Profissional é obrigatório para gerar os planos.', 'error');
       return;
     }
-    
+
     setSaving(true);
     try {
-        await storageService.saveProfile(profile);
-        setShowSuccess(true);
-        setTimeout(() => setShowSuccess(false), 3000);
+      await storageService.saveProfile(profile);
+      showNotification('Perfil atualizado com sucesso!', 'success');
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
     } catch (e) {
-        alert("Erro ao salvar perfil.");
+      showNotification("Erro ao salvar perfil.", 'error');
     } finally {
-        setSaving(false);
+      setSaving(false);
     }
   };
 
   if (loading) {
-      return (
-          <Layout title="Perfil">
-             <div className="flex h-[50vh] items-center justify-center">
-                 <Loader2 className="animate-spin text-emerald-600 w-10 h-10" />
-             </div>
-          </Layout>
-      );
+    return (
+      <Layout title="Perfil">
+        <div className="flex h-[50vh] items-center justify-center">
+          <Loader2 className="animate-spin text-emerald-600 w-10 h-10" />
+        </div>
+      </Layout>
+    );
   }
 
   return (
@@ -84,43 +87,43 @@ export const Profile: React.FC = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            
+
             {/* Logo Upload Section */}
             <div className="flex flex-col sm:flex-row items-center gap-6 p-4 bg-slate-50 rounded-xl border border-slate-100 mb-6">
-               <div className="relative group cursor-pointer w-24 h-24 shrink-0">
-                  <input 
-                    type="file" 
-                    accept="image/*" 
-                    onChange={handleLogoUpload}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                    disabled={saving}
-                  />
-                  <div className={`w-full h-full rounded-full border-2 border-dashed flex items-center justify-center overflow-hidden transition-all bg-white ${profile.logoUrl ? 'border-emerald-500' : 'border-slate-300 hover:border-emerald-400'}`}>
-                    {profile.logoUrl ? (
-                      <img src={profile.logoUrl} alt="Logo Profissional" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="text-center p-1">
-                        <Upload className="w-6 h-6 text-slate-400 mx-auto mb-1" />
-                        <span className="text-[9px] text-slate-400 uppercase font-bold block">Sua Logo</span>
-                      </div>
-                    )}
-                  </div>
-               </div>
-               <div className="text-center sm:text-left">
-                  <h3 className="font-semibold text-slate-800">Logo do Profissional</h3>
-                  <p className="text-xs text-slate-500 mt-1 max-w-xs">
-                    Carregue sua logomarca para personalizar os documentos. Recomendado: Formato quadrado (PNG ou JPG).
-                  </p>
-                  {profile.logoUrl && (
-                    <button 
-                      type="button" 
-                      onClick={() => setProfile(prev => ({...prev, logoUrl: ''}))}
-                      className="text-xs text-red-500 hover:text-red-700 mt-2 font-medium"
-                    >
-                      Remover Logo
-                    </button>
+              <div className="relative group cursor-pointer w-24 h-24 shrink-0">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  disabled={saving}
+                />
+                <div className={`w-full h-full rounded-full border-2 border-dashed flex items-center justify-center overflow-hidden transition-all bg-white ${profile.logoUrl ? 'border-emerald-500' : 'border-slate-300 hover:border-emerald-400'}`}>
+                  {profile.logoUrl ? (
+                    <img src={profile.logoUrl} alt="Logo Profissional" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="text-center p-1">
+                      <Upload className="w-6 h-6 text-slate-400 mx-auto mb-1" />
+                      <span className="text-[9px] text-slate-400 uppercase font-bold block">Sua Logo</span>
+                    </div>
                   )}
-               </div>
+                </div>
+              </div>
+              <div className="text-center sm:text-left">
+                <h3 className="font-semibold text-slate-800">Logo do Profissional</h3>
+                <p className="text-xs text-slate-500 mt-1 max-w-xs">
+                  Carregue sua logomarca para personalizar os documentos. Recomendado: Formato quadrado (PNG ou JPG).
+                </p>
+                {profile.logoUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setProfile(prev => ({ ...prev, logoUrl: '' }))}
+                    className="text-xs text-red-500 hover:text-red-700 mt-2 font-medium"
+                  >
+                    Remover Logo
+                  </button>
+                )}
+              </div>
             </div>
 
             <div>
@@ -174,7 +177,7 @@ export const Profile: React.FC = () => {
                   Informações salvas com sucesso!
                 </div>
               ) : (
-                 <div></div>
+                <div></div>
               )}
               <button
                 type="submit"
@@ -192,24 +195,24 @@ export const Profile: React.FC = () => {
         <div className="mt-8 bg-slate-100 border border-slate-200 rounded-xl p-6 opacity-80">
           <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Como aparecerá no PDF</h3>
           <div className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm max-w-sm">
-             <div className="flex items-start gap-4">
-                <div className="w-12 h-12 shrink-0 rounded-full flex items-center justify-center border border-slate-200 bg-slate-50 overflow-hidden">
-                  {profile.logoUrl ? (
-                    <img src={profile.logoUrl} alt="Logo" className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-xs text-slate-400">Logo</span>
-                  )}
-                </div>
-                <div>
-                   <div className="font-bold text-slate-800">{profile.name || "Nome do Profissional"}</div>
-                   {(profile.title || profile.registration) && (
-                     <div className="text-xs text-slate-500 mt-1">
-                       {profile.title} <br/>
-                       {profile.registration}
-                     </div>
-                   )}
-                </div>
-             </div>
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 shrink-0 rounded-full flex items-center justify-center border border-slate-200 bg-slate-50 overflow-hidden">
+                {profile.logoUrl ? (
+                  <img src={profile.logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-xs text-slate-400">Logo</span>
+                )}
+              </div>
+              <div>
+                <div className="font-bold text-slate-800">{profile.name || "Nome do Profissional"}</div>
+                {(profile.title || profile.registration) && (
+                  <div className="text-xs text-slate-500 mt-1">
+                    {profile.title} <br />
+                    {profile.registration}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>

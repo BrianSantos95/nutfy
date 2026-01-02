@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Layout } from '../components/Layout';
 import { GoogleGenAI, Chat, GenerateContentResponse } from "@google/genai";
 import { Send, Bot, User, Sparkles, Loader2 } from 'lucide-react';
+import { useNotification } from '../contexts/NotificationContext';
 
 interface Message {
     role: 'user' | 'model';
@@ -45,6 +46,7 @@ export const AIChat: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const chatSessionRef = useRef<Chat | null>(null);
+    const { showNotification } = useNotification();
 
     const initializeChat = () => {
         const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
@@ -86,7 +88,7 @@ export const AIChat: React.FC = () => {
 
         const chat = initializeChat();
         if (!chat) {
-            alert("Erro de autenticação com o serviço de IA.");
+            showNotification("Erro de autenticação com o serviço de IA.", 'error');
             return;
         }
 
