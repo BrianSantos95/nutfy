@@ -31,11 +31,11 @@ export interface MonthlyStats {
 }
 
 export const reportService = {
-    
+
     getStats: async (targetMonth: number, targetYear: number): Promise<MonthlyStats> => {
         const allStudents = await storageService.getStudents();
         const allAssessments = await storageService.getAssessments(); // Assume que pega todas de todos os alunos se não passar ID
-        
+
         const stats: MonthlyStats = {
             totalActive: 0,
             newStudents: 0,
@@ -63,9 +63,16 @@ export const reportService = {
         // Helper para checar se um aluno estava ativo em um determinado período
         const isStudentActiveInPeriod = (student: Student, periodStart: Date, periodEnd: Date) => {
             if (!student.planEndDate) return false;
-            const pStart = student.planStartDate ? new Date(student.planStartDate) : new Date(student.createdAt);
+
+            // Parsing robusto de data string YYYY-MM-DD
+            const parseDate = (dStr: string) => {
+                const parts = dStr.split('T')[0].split('-').map(Number);
+                return new Date(parts[0], parts[1] - 1, parts[2]);
+            };
+
+            const pStart = student.planStartDate ? parseDate(student.planStartDate) : new Date(student.createdAt);
             pStart.setHours(0, 0, 0, 0);
-            const pEnd = new Date(student.planEndDate);
+            const pEnd = parseDate(student.planEndDate);
             pEnd.setHours(23, 59, 59, 999);
             return pStart <= periodEnd && pEnd >= periodStart;
         };
@@ -74,7 +81,7 @@ export const reportService = {
         allStudents.forEach(s => {
             const planStart = s.planStartDate ? new Date(s.planStartDate) : new Date(s.createdAt);
             planStart.setHours(0, 0, 0, 0);
-            
+
             const planEnd = s.planEndDate ? new Date(s.planEndDate) : null;
             if (planEnd) planEnd.setHours(23, 59, 59, 999);
 
@@ -98,7 +105,7 @@ export const reportService = {
                     description: `${s.name} iniciou o acompanhamento.`
                 });
             }
-            
+
             // RENOVAÇÕES (Timeline Event)
             else if (planStart >= startOfMonth && planStart <= endOfMonth && createdAt < startOfMonth) {
                 stats.renewals++;
@@ -129,13 +136,16 @@ export const reportService = {
         // Nota: getAssessments() sem argumento deve retornar TODAS as avaliações no storageService atualizado, 
         // ou precisamos iterar alunos. O mock atual em storageService.ts pega todas se não passar ID.
         // Se a implementação real for diferente, precisaria ajustar. Assumindo que retorna todas array.
-        
+
         allAssessments.forEach(a => {
-            const aDate = new Date(a.date);
+            if (!a.date) return;
+            const parts = a.date.split('T')[0].split('-').map(Number);
+            const aDate = new Date(parts[0], parts[1] - 1, parts[2]);
+
             if (aDate >= startOfMonth && aDate <= endOfMonth) {
                 stats.totalAssessments++;
                 stats.totalPlans++; // Assumindo 1 plano por avaliação neste modelo simplificado
-                
+
                 // Encontrar nome do aluno
                 const studentName = allStudents.find(s => s.id === a.studentId)?.name || 'Paciente';
 
@@ -178,7 +188,7 @@ export const reportService = {
             const y = d.getFullYear();
             const m = d.getMonth();
             const monthLabel = d.toLocaleDateString('pt-BR', { month: 'short' });
-            
+
             const mStart = new Date(y, m, 1);
             mStart.setHours(0, 0, 0, 0);
             const mEnd = new Date(y, m + 1, 0);
@@ -187,12 +197,12 @@ export const reportService = {
             let activeCount = 0;
             let inCount = 0;
             let outCount = 0;
-            
+
             allStudents.forEach(s => {
                 const pStart = s.planStartDate ? new Date(s.planStartDate) : new Date(s.createdAt);
-                pStart.setHours(0,0,0,0);
+                pStart.setHours(0, 0, 0, 0);
                 const pEnd = s.planEndDate ? new Date(s.planEndDate) : null;
-                if (pEnd) pEnd.setHours(23,59,59,999);
+                if (pEnd) pEnd.setHours(23, 59, 59, 999);
 
                 if (isStudentActiveInPeriod(s, mStart, mEnd)) activeCount++;
                 if (pStart >= mStart && pStart <= mEnd) inCount++;
@@ -211,7 +221,7 @@ export const reportService = {
             const end = new Date(s.planEndDate);
             end.setHours(23, 59, 59, 999);
             return end >= today && end <= next30Days;
-        }).sort((a,b) => new Date(a.planEndDate!).getTime() - new Date(b.planEndDate!).getTime());
+        }).sort((a, b) => new Date(a.planEndDate!).getTime() - new Date(b.planEndDate!).getTime());
 
         return stats;
     }

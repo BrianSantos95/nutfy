@@ -250,7 +250,12 @@ export const Dashboard: React.FC = () => {
                                 <div className="flex-1 w-full md:w-auto flex items-center justify-between md:justify-end gap-8 text-sm">
                                     <div className="text-right hidden sm:block">
                                         <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Vencimento</p>
-                                        <p className="font-bold text-slate-700 dark:text-slate-300">{student.planEndDate ? new Date(student.planEndDate + 'T12:00:00').toLocaleDateString('pt-BR') : '--'}</p>
+                                        <p className="font-bold text-slate-700 dark:text-slate-300">
+                                            {student.planEndDate
+                                                ? student.planEndDate.split('T')[0].split('-').reverse().join('/')
+                                                : '--'
+                                            }
+                                        </p>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <button onClick={(e) => { e.stopPropagation(); navigate(`/student/${student.id}/edit`); }} className="p-3 rounded-2xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"><Edit2 size={20} /></button>

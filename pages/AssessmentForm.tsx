@@ -38,16 +38,9 @@ export const AssessmentForm: React.FC = () => {
                 const all = await storageService.getAssessments(studentId);
                 const found = all.find(a => a.id === assessmentId);
                 if (found) {
-                    let d = '';
-                    if (found.date) {
-                        const dateObj = new Date(found.date.includes('T') ? found.date : `${found.date}T12:00:00`);
-                        if (!isNaN(dateObj.getTime())) {
-                            d = dateObj.toISOString().split('T')[0];
-                        }
-                    }
                     setFormData({
                         ...found,
-                        date: d
+                        date: found.date ? found.date.split('T')[0] : ''
                     });
 
                     // Verifica se o objetivo é padrão ou personalizado

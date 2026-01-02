@@ -81,7 +81,7 @@ export const MealManager: React.FC = () => {
   const isOver = calorieDiff > 0;
 
   return (
-    <Layout title={`Plano: ${new Date(assessment.date).toLocaleDateString()}`} showBack backPath={`/student/${studentId}/progress`}>
+    <Layout title={`Plano: ${assessment.date ? assessment.date.split('T')[0].split('-').reverse().join('/') : '--/--/----'}`} showBack backPath={`/student/${studentId}/progress`}>
       {/* Summary Header */}
       <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 mb-8 flex flex-col md:flex-row justify-between items-center gap-6">
         <div>
@@ -131,8 +131,8 @@ export const MealManager: React.FC = () => {
           <div
             key={meal.id}
             className={`rounded-xl border p-5 flex flex-col sm:flex-row items-start gap-4 transition-colors ${meal.type === 'free'
-                ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-900'
-                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'
+              ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-900'
+              : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'
               }`}
           >
 
