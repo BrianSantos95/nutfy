@@ -10,7 +10,7 @@ const toDbStudent = (s: Student, userId: string) => ({
   user_id: userId,
   name: s.name,
   logo_url: s.logoUrl,
-  created_at: s.createdAt,
+  created_at: emptyToNull(s.createdAt),
   contact: s.contact,
   birth_date: emptyToNull(s.birthDate),
   next_appointment: emptyToNull(s.nextAppointment),
