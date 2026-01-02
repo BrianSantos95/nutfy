@@ -2,6 +2,9 @@
 -- UPDATE: ESTATÍSTICAS DE ALUNOS NO ADMIN
 -- ==========================================
 
+-- NECESSÁRIO DROPAR A FUNÇÃO ANTIGA POIS O TIPO DE RETORNO MUDOU
+DROP FUNCTION IF EXISTS get_admin_dashboard_data();
+
 -- Atualiza a função para retornar contagem de alunos ativos e inativos
 CREATE OR REPLACE FUNCTION get_admin_dashboard_data()
 RETURNS TABLE (
