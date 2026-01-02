@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Student, Assessment } from '../types';
 import { storageService } from '../services/storageService';
+import { useNotification } from '../contexts/NotificationContext';
 import { Activity, Calendar, Plus, ChevronRight, TrendingUp, Scale, Trash2, Clock, RotateCw, X, Edit2, Loader2, AlertTriangle } from 'lucide-react';
 
 export const PatientProgress: React.FC = () => {
@@ -15,10 +16,7 @@ export const PatientProgress: React.FC = () => {
     const [showRenewModal, setShowRenewModal] = useState(false);
     const [renewDate, setRenewDate] = useState('');
     const [isRenewing, setIsRenewing] = useState(false);
-
-    // Modal de Exclusão
-    const [assessmentToDelete, setAssessmentToDelete] = useState<string | null>(null);
-    const [isDeleting, setIsDeleting] = useState(false);
+    const { showNotification, confirm } = useNotification();
 
     useEffect(() => {
         const load = async () => {
@@ -43,23 +41,22 @@ export const PatientProgress: React.FC = () => {
 
     const requestDeleteAssessment = (e: React.MouseEvent, id: string) => {
         e.stopPropagation();
-        setAssessmentToDelete(id);
-    };
-
-    const confirmDeleteAssessment = async () => {
-        if (!assessmentToDelete || !studentId) return;
-
-        setIsDeleting(true);
-        try {
-            await storageService.deleteAssessment(assessmentToDelete);
-            const updated = await storageService.getAssessments(studentId);
-            setAssessments(updated);
-            setAssessmentToDelete(null);
-        } catch (error) {
-            alert("Erro ao excluir avaliação.");
-        } finally {
-            setIsDeleting(false);
-        }
+        confirm({
+            title: "Excluir Avaliação?",
+            message: "Esta ação é irreversível. O plano alimentar vinculado a esta avaliação também será removido permanentemente.",
+            confirmText: "Excluir",
+            cancelText: "Cancelar",
+            onConfirm: async () => {
+                try {
+                    await storageService.deleteAssessment(id);
+                    const updated = await storageService.getAssessments(studentId!);
+                    setAssessments(updated);
+                    showNotification("Avaliação removida com sucesso.", "success");
+                } catch (error) {
+                    showNotification("Erro ao excluir avaliação.", "error");
+                }
+            }
+        });
     };
 
     const handleRenewPlan = async () => {
@@ -78,9 +75,9 @@ export const PatientProgress: React.FC = () => {
 
             setStudent(updatedStudent);
             setShowRenewModal(false);
-            alert('Plano renovado com sucesso!');
+            showNotification('Plano renovado com sucesso!', 'success');
         } catch (e: any) {
-            alert('Erro ao renovar: ' + e.message);
+            showNotification('Erro ao renovar: ' + e.message, 'error');
         } finally {
             setIsRenewing(false);
         }
@@ -293,7 +290,7 @@ export const PatientProgress: React.FC = () => {
                 </div>
             </div>
 
-            {/* MODAL DE RENOVAÇÃO */}
+            {/* MODAL DE RENOVAÇÃO (Mantido como modal específico pois tem input) */}
             {showRenewModal && (
                 <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
                     <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-6 w-full max-w-sm border border-slate-200 dark:border-slate-800">
@@ -324,47 +321,6 @@ export const PatientProgress: React.FC = () => {
                             >
                                 {isRenewing ? <Loader2 className="animate-spin" /> : 'Confirmar Renovação'}
                             </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* MODAL DE EXCLUSÃO DE AVALIAÇÃO */}
-            {assessmentToDelete && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-6 w-full max-w-md border border-red-100 dark:border-red-900/30">
-                        <div className="flex justify-between items-start mb-6">
-                            <div className="flex items-center gap-3">
-                                <div className="bg-red-100 dark:bg-red-900/30 p-2 rounded-xl">
-                                    <AlertTriangle className="text-red-600 dark:text-red-400 w-6 h-6" />
-                                </div>
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Excluir Avaliação?</h3>
-                            </div>
-                            <button onClick={() => setAssessmentToDelete(null)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                                <X size={20} />
-                            </button>
-                        </div>
-
-                        <div className="space-y-4">
-                            <p className="text-slate-600 dark:text-slate-400 text-sm">
-                                Esta ação é irreversível. O plano alimentar vinculado a esta avaliação também será removido permanentemente.
-                            </p>
-
-                            <div className="flex gap-3 pt-2">
-                                <button
-                                    onClick={() => setAssessmentToDelete(null)}
-                                    className="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold py-3.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                                >
-                                    Cancelar
-                                </button>
-                                <button
-                                    onClick={confirmDeleteAssessment}
-                                    disabled={isDeleting}
-                                    className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-red-200 dark:shadow-none flex items-center justify-center gap-2"
-                                >
-                                    {isDeleting ? <Loader2 className="animate-spin" /> : 'Excluir'}
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>

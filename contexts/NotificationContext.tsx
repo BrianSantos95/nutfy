@@ -9,14 +9,25 @@ interface Notification {
     type: NotificationType;
 }
 
+interface ConfirmOptions {
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    onCancel?: () => void;
+    confirmText?: string;
+    cancelText?: string;
+}
+
 interface NotificationContextType {
     showNotification: (message: string, type?: NotificationType) => void;
+    confirm: (options: ConfirmOptions) => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [notifications, setNotifications] = useState<Notification[]>([]);
+    const [confirmModal, setConfirmModal] = useState<ConfirmOptions | null>(null);
 
     const removeNotification = useCallback((id: string) => {
         setNotifications(prev => prev.filter(n => n.id !== id));
@@ -32,8 +43,26 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }, 5000);
     }, [removeNotification]);
 
+    const confirm = useCallback((options: ConfirmOptions) => {
+        setConfirmModal(options);
+    }, []);
+
+    const handleConfirm = () => {
+        if (confirmModal) {
+            confirmModal.onConfirm();
+            setConfirmModal(null);
+        }
+    };
+
+    const handleCancel = () => {
+        if (confirmModal) {
+            if (confirmModal.onCancel) confirmModal.onCancel();
+            setConfirmModal(null);
+        }
+    };
+
     return (
-        <NotificationContext.Provider value={{ showNotification }}>
+        <NotificationContext.Provider value={{ showNotification, confirm }}>
             {children}
             {/* Container de Notificações */}
             <div className="fixed top-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none">
@@ -49,8 +78,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             `}
                     >
                         <div className={`p-2 rounded-xl ${n.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500' :
-                                n.type === 'error' ? 'bg-red-50 dark:bg-red-500/10 text-red-500' :
-                                    'bg-blue-50 dark:bg-blue-500/10 text-blue-500'
+                            n.type === 'error' ? 'bg-red-50 dark:bg-red-500/10 text-red-500' :
+                                'bg-blue-50 dark:bg-blue-500/10 text-blue-500'
                             }`}>
                             {n.type === 'success' && <CheckCircle size={20} />}
                             {n.type === 'error' && <AlertCircle size={20} />}
@@ -71,6 +100,30 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                     </div>
                 ))}
             </div>
+
+            {/* Modal de Confirmação Global */}
+            {confirmModal && (
+                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[10000] flex items-center justify-center p-4 animate-in fade-in duration-200">
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl p-8 w-full max-w-sm border border-slate-100 dark:border-slate-800">
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{confirmModal.title}</h3>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm mb-8 leading-relaxed">{confirmModal.message}</p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={handleCancel}
+                                className="flex-1 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold py-3.5 rounded-2xl hover:bg-slate-100 transition-colors"
+                            >
+                                {confirmModal.cancelText || 'Cancelar'}
+                            </button>
+                            <button
+                                onClick={handleConfirm}
+                                className="flex-1 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold py-3.5 rounded-2xl hover:opacity-90 transition-opacity"
+                            >
+                                {confirmModal.confirmText || 'Confirmar'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </NotificationContext.Provider>
     );
 };

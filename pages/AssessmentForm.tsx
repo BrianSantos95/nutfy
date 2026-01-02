@@ -4,11 +4,13 @@ import { Layout } from '../components/Layout';
 import { Assessment } from '../types';
 import { storageService } from '../services/storageService';
 import { Scale, Ruler, Flame, Save, Activity, Target } from 'lucide-react';
+import { useNotification } from '../contexts/NotificationContext';
 
 export const AssessmentForm: React.FC = () => {
     const navigate = useNavigate();
     const { studentId, assessmentId } = useParams();
     const isEditing = !!assessmentId && assessmentId !== 'new';
+    const { showNotification, confirm } = useNotification();
 
     const [formData, setFormData] = useState<Partial<Assessment>>({
         weight: undefined,
@@ -62,7 +64,7 @@ export const AssessmentForm: React.FC = () => {
         e.preventDefault();
 
         if (!formData.weight || !formData.height || !formData.calorieGoal) {
-            alert("Peso, Altura e Meta Calórica são obrigatórios.");
+            showNotification("Peso, Altura e Meta Calórica são obrigatórios.", "error");
             return;
         }
 
@@ -81,15 +83,18 @@ export const AssessmentForm: React.FC = () => {
 
         await storageService.saveAssessment(payload);
 
-        // Se for nova avaliação, redireciona para criar o plano (Refeições)
-        // Se for edição, volta para o dashboard do aluno
+        // Se for nova avaliação, pergunta se deseja montar o plano
         if (!isEditing) {
-            if (confirm("Avaliação registrada! Deseja montar o plano alimentar agora?")) {
-                navigate(`/student/${studentId}/assessment/${payload.id}/meals`);
-            } else {
-                navigate(`/student/${studentId}/progress`);
-            }
+            confirm({
+                title: "Avaliação registrada!",
+                message: "Deseja montar o plano alimentar agora?",
+                confirmText: "Sim, agora",
+                cancelText: "Depois",
+                onConfirm: () => navigate(`/student/${studentId}/assessment/${payload.id}/meals`),
+                onCancel: () => navigate(`/student/${studentId}/progress`)
+            });
         } else {
+            showNotification("Avaliação atualizada com sucesso!", "success");
             navigate(`/student/${studentId}/progress`);
         }
     };
