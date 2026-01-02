@@ -3,7 +3,7 @@ import { Layout } from '../components/Layout';
 import { useAuth } from '../contexts/AuthContext';
 import { adminService, AdminUser } from '../services/adminService';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Users, UserCheck, UserX, Search, Calendar, Plus, Loader2, AlertTriangle, CheckCircle, Mail, Phone, DollarSign } from 'lucide-react';
+import { Shield, Users, UserCheck, UserX, Search, Calendar, Plus, Loader2, AlertTriangle, CheckCircle, Mail, Phone, DollarSign, Eye, X } from 'lucide-react';
 import { useNotification } from '../contexts/NotificationContext';
 
 export const AdminPanel: React.FC = () => {
@@ -17,6 +17,7 @@ export const AdminPanel: React.FC = () => {
 
     // Estado para Modal de Adicionar Dias
     const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
+    const [viewingUser, setViewingUser] = useState<AdminUser | null>(null); // Novo: Estado para ver detalhes
     const [trialDays, setTrialDays] = useState(7);
     const [isProcessing, setIsProcessing] = useState(false);
 
@@ -193,12 +194,21 @@ export const AdminPanel: React.FC = () => {
                                             </div>
                                         </td>
                                         <td className="py-4 px-6 text-right">
-                                            <button
-                                                onClick={() => setSelectedUser(u)}
-                                                className="text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors inline-flex items-center gap-1"
-                                            >
-                                                <Plus size={16} /> Add Dias
-                                            </button>
+                                            <div className="flex justify-end gap-2">
+                                                <button
+                                                    onClick={() => setViewingUser(u)}
+                                                    className="text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-lg transition-colors"
+                                                    title="Ver Detalhes"
+                                                >
+                                                    <Eye size={20} />
+                                                </button>
+                                                <button
+                                                    onClick={() => setSelectedUser(u)}
+                                                    className="text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors inline-flex items-center gap-1"
+                                                >
+                                                    <Plus size={16} /> Add Dias
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
@@ -228,8 +238,8 @@ export const AdminPanel: React.FC = () => {
                                             key={days}
                                             onClick={() => setTrialDays(days)}
                                             className={`py-2 rounded-xl border text-sm font-bold transition-all ${trialDays === days
-                                                    ? 'bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
-                                                    : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-emerald-300'
+                                                ? 'bg-emerald-50 border-emerald-500 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                                                : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-emerald-300'
                                                 }`}
                                         >
                                             +{days} Dias
@@ -263,6 +273,90 @@ export const AdminPanel: React.FC = () => {
                                     {isProcessing ? <Loader2 className="animate-spin" /> : <CheckCircle size={20} />}
                                     Confirmar
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* View Details Modal */}
+                {viewingUser && (
+                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+                        <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-2xl p-0 shadow-2xl animate-in fade-in zoom-in duration-200 overflow-hidden">
+                            {/* Modal Header */}
+                            <div className="bg-slate-50 dark:bg-slate-950 p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-start">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-16 h-16 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center overflow-hidden border-2 border-white dark:border-slate-700 shadow-sm">
+                                        {viewingUser.logo_url ? (
+                                            <img src={viewingUser.logo_url} alt="" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <span className="font-bold text-slate-500 text-lg">{viewingUser.name?.substring(0, 2).toUpperCase() || 'NU'}</span>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">{viewingUser.name || 'Sem Nome'}</h3>
+                                        <div className="flex items-center gap-2 text-slate-500 text-sm mt-1">
+                                            <Mail size={14} />
+                                            {viewingUser.email}
+                                        </div>
+                                        {viewingUser.phone && (
+                                            <div className="flex items-center gap-2 text-slate-500 text-sm mt-1">
+                                                <Phone size={14} />
+                                                {viewingUser.phone}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                                <button onClick={() => setViewingUser(null)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-2xl">
+                                    <X />
+                                </button>
+                            </div>
+
+                            {/* Modal Body */}
+                            <div className="p-8">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                                    <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50">
+                                        <div className="text-blue-500 text-xs font-bold uppercase mb-1">Total de Pacientes</div>
+                                        <div className="text-2xl font-black text-blue-700 dark:text-blue-400">{viewingUser.total_students || 0}</div>
+                                    </div>
+                                    <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/50">
+                                        <div className="text-emerald-500 text-xs font-bold uppercase mb-1">Pacientes Ativos</div>
+                                        <div className="text-2xl font-black text-emerald-700 dark:text-emerald-400">{viewingUser.active_students || 0}</div>
+                                    </div>
+                                    <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700">
+                                        <div className="text-slate-500 text-xs font-bold uppercase mb-1">Inativos</div>
+                                        <div className="text-2xl font-black text-slate-700 dark:text-slate-400">{(viewingUser.total_students || 0) - (viewingUser.active_students || 0)}</div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <h4 className="font-bold text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-2">Informações da Assinatura</h4>
+                                    <div className="grid grid-cols-2 gap-y-4 text-sm">
+                                        <div>
+                                            <div className="text-slate-500">Status</div>
+                                            <div className="font-medium text-slate-900 dark:text-white mt-1">
+                                                <StatusBadge status={viewingUser.subscription_status} plan={viewingUser.plan_type} />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div className="text-slate-500">Vencimento</div>
+                                            <div className="font-medium text-slate-900 dark:text-white mt-1">
+                                                {formatDate(viewingUser.plan_expiration_date || viewingUser.trial_end_date)}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div className="text-slate-500">Última Renovação/Início</div>
+                                            <div className="font-medium text-slate-900 dark:text-white mt-1">
+                                                {formatDate(viewingUser.last_renewal)}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div className="text-slate-500">ID do Usuário</div>
+                                            <div className="font-mono text-xs text-slate-400 mt-1 truncate max-w-[150px]" title={viewingUser.user_id}>
+                                                {viewingUser.user_id}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

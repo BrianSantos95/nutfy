@@ -11,6 +11,8 @@ export interface AdminUser {
     start_date: string;
     plan_expiration_date: string;
     last_renewal: string;
+    total_students: number;
+    active_students: number;
 }
 
 export const adminService = {
