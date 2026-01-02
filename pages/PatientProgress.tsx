@@ -134,8 +134,18 @@ export const PatientProgress: React.FC = () => {
                             <span className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800 px-2 py-1 rounded-lg border border-slate-100 dark:border-slate-700">
                                 <Clock size={14} className={daysRemaining !== null && daysRemaining <= 3 ? 'text-red-400' : 'text-slate-400'} />
                                 {daysRemaining !== null && daysRemaining < 0
-                                    ? `Expirou dia ${!isNaN(new Date(student.planEndDate + 'T12:00:00').getTime()) ? new Date(student.planEndDate + 'T12:00:00').toLocaleDateString('pt-BR') : '--'}`
-                                    : `Vence em ${daysRemaining} dias (${!isNaN(new Date(student.planEndDate + 'T12:00:00').getTime()) ? new Date(student.planEndDate + 'T12:00:00').toLocaleDateString('pt-BR') : '--'})`
+                                    ? `Expirou dia ${(() => {
+                                        if (!student.planEndDate) return '--';
+                                        const dateStr = student.planEndDate.includes('T') ? student.planEndDate : `${student.planEndDate}T12:00:00`;
+                                        const d = new Date(dateStr);
+                                        return !isNaN(d.getTime()) ? d.toLocaleDateString('pt-BR') : '--';
+                                    })()}`
+                                    : `Vence em ${daysRemaining} dias (${(() => {
+                                        if (!student.planEndDate) return '--';
+                                        const dateStr = student.planEndDate.includes('T') ? student.planEndDate : `${student.planEndDate}T12:00:00`;
+                                        const d = new Date(dateStr);
+                                        return !isNaN(d.getTime()) ? d.toLocaleDateString('pt-BR') : '--';
+                                    })()})`
                                 }
                             </span>
                         )}
@@ -183,8 +193,8 @@ export const PatientProgress: React.FC = () => {
                                     key={assessment.id}
                                     onClick={() => navigate(`/student/${studentId}/assessment/${assessment.id}/meals`)}
                                     className={`bg-white dark:bg-slate-900 p-6 rounded-2xl border transition-all cursor-pointer group relative overflow-hidden ${assessment.status === 'active'
-                                            ? 'border-emerald-500 shadow-lg shadow-emerald-100 dark:shadow-emerald-900/20 ring-1 ring-emerald-500'
-                                            : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md'
+                                        ? 'border-emerald-500 shadow-lg shadow-emerald-100 dark:shadow-emerald-900/20 ring-1 ring-emerald-500'
+                                        : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md'
                                         }`}
                                 >
                                     {assessment.status === 'active' && (
@@ -198,9 +208,13 @@ export const PatientProgress: React.FC = () => {
                                             <div className="flex items-center gap-2 mb-2">
                                                 <Calendar size={16} className="text-slate-400" />
                                                 <span className="font-bold text-slate-800 dark:text-white text-lg">
-                                                    {assessment.date && !isNaN(new Date(assessment.date + 'T12:00:00').getTime())
-                                                        ? new Date(assessment.date + 'T12:00:00').toLocaleDateString('pt-BR')
-                                                        : 'Data não informada'}
+                                                    {(() => {
+                                                        if (!assessment.date) return 'Data não informada';
+                                                        // Se a data não tem 'T', adiciona T12:00:00 para evitar problemas de fuso
+                                                        const dateStr = assessment.date.includes('T') ? assessment.date : `${assessment.date}T12:00:00`;
+                                                        const d = new Date(dateStr);
+                                                        return !isNaN(d.getTime()) ? d.toLocaleDateString('pt-BR') : 'Data inválida';
+                                                    })()}
                                                 </span>
                                             </div>
                                             <div className="flex gap-6 text-sm text-slate-600 dark:text-slate-400">
