@@ -315,7 +315,7 @@ export const Dashboard: React.FC = () => {
                             <button onClick={() => setStudentToDelete(null)} className="text-slate-400 hover:text-slate-600"><X size={20} /></button>
                         </div>
                         <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">Digite <strong>excluir</strong> para confirmar a remoção definitiva.</p>
-                        <input type="text" value={deleteConfirmation} onChange={(e) => setDeleteConfirmation(e.target.value)} placeholder="Digite 'excluir'" className="w-full px-4 py-3 border border-slate-200 rounded-xl mb-4 outline-none focus:border-red-500" />
+                        <input type="text" value={deleteConfirmation} onChange={(e) => setDeleteConfirmation(e.target.value)} placeholder="Digite 'excluir'" className="w-full px-4 py-3 bg-white dark:bg-slate-950 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-800 rounded-xl mb-4 outline-none focus:border-red-500" />
                         <div className="flex gap-3">
                             <button onClick={() => setStudentToDelete(null)} className="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-white py-3 rounded-xl font-bold transition-colors hover:bg-slate-200 dark:hover:bg-slate-700">Cancelar</button>
                             <button onClick={confirmDelete} disabled={deleteConfirmation.toLowerCase() !== 'excluir' || isDeleting} className="flex-1 bg-red-600 text-white py-3 rounded-xl font-bold disabled:opacity-50">Excluir</button>
