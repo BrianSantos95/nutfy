@@ -104,6 +104,20 @@ export const Dashboard: React.FC = () => {
         return matchesSearch && matchesStatus;
     }).sort((a, b) => a.name.localeCompare(b.name));
 
+    // Pagination Logic
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 10;
+    const totalPages = Math.ceil(filteredStudents.length / ITEMS_PER_PAGE);
+
+    const paginatedStudents = filteredStudents.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [search, statusFilter, students]);
+
     const greetingData = getGreeting();
     const professionalName = profile?.name ? profile.name.split(' ')[0] : 'Nutri';
 
@@ -135,7 +149,7 @@ export const Dashboard: React.FC = () => {
             )}
 
             <div className="mb-10">
-                <div className="rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-white dark:border-slate-800 relative overflow-hidden bg-white dark:bg-slate-900 transition-colors">
+                <div className="rounded-2xl p-8 md:p-12 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 border border-white dark:border-slate-800 relative overflow-hidden bg-white dark:bg-slate-900 transition-colors">
                     <div className={`absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none opacity-60 ${greetingData.blobColor}`}></div>
                     <div className={`absolute bottom-0 left-0 w-64 h-64 rounded-full blur-3xl -ml-10 -mb-10 pointer-events-none opacity-40 ${greetingData.blobColor}`}></div>
 
@@ -167,7 +181,7 @@ export const Dashboard: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-lg shadow-slate-200/40 flex items-center gap-5">
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-lg shadow-slate-200/40 dark:shadow-slate-900/50 flex items-center gap-5">
                     <div className="w-16 h-16 rounded-2xl bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 flex items-center justify-center">
                         <Users size={28} />
                     </div>
@@ -177,7 +191,7 @@ export const Dashboard: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-lg shadow-slate-200/40 flex items-center gap-5">
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-lg shadow-slate-200/40 dark:shadow-slate-900/50 flex items-center gap-5">
                     <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                         <Activity size={28} />
                     </div>
@@ -187,7 +201,7 @@ export const Dashboard: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-lg shadow-slate-200/40 flex items-center gap-5">
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-lg shadow-slate-200/40 dark:shadow-slate-900/50 flex items-center gap-5">
                     <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center">
                         <PauseCircle size={28} />
                     </div>
@@ -221,7 +235,7 @@ export const Dashboard: React.FC = () => {
             </div>
 
             <div className="space-y-4 pb-20">
-                {filteredStudents.length === 0 ? (
+                {paginatedStudents.length === 0 ? (
                     <div className="text-center py-24 bg-white dark:bg-slate-900 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-800">
                         <div className="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
                             <Users className="text-slate-300" size={32} />
@@ -230,42 +244,66 @@ export const Dashboard: React.FC = () => {
                         <button onClick={() => navigate('/student/new')} className="text-emerald-600 dark:text-emerald-400 font-bold mt-2 hover:underline text-sm">Clique para cadastrar o primeiro</button>
                     </div>
                 ) : (
-                    filteredStudents.map(student => {
-                        const days = getDaysRemaining(student.planEndDate);
-                        const isActive = days !== null && days >= 0;
-                        return (
-                            <div key={student.id} onClick={() => navigate(`/student/${student.id}/progress`)} className="group bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
-                                <div className={`absolute left-0 top-0 bottom-0 w-2 ${isActive ? 'bg-emerald-400' : 'bg-slate-200 dark:bg-slate-700'}`}></div>
-                                <div className="flex items-center gap-5 w-full md:w-1/2 pl-4">
-                                    <div className="w-16 h-16 rounded-[1.2rem] bg-slate-50 dark:bg-slate-800 overflow-hidden border border-slate-100 shrink-0">
-                                        {student.logoUrl ? <img src={student.logoUrl} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-slate-300 font-bold text-xl">{student.name[0]}</div>}
+                    <>
+                        {paginatedStudents.map(student => {
+                            const days = getDaysRemaining(student.planEndDate);
+                            const isActive = days !== null && days >= 0;
+                            return (
+                                <div key={student.id} onClick={() => navigate(`/student/${student.id}/progress`)} className="group bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
+                                    <div className={`absolute left-0 top-0 bottom-0 w-2 ${isActive ? 'bg-emerald-400' : 'bg-slate-200 dark:bg-slate-700'}`}></div>
+                                    <div className="flex items-center gap-5 w-full md:w-1/2 pl-4">
+                                        <div className="w-16 h-16 rounded-[1.2rem] bg-slate-50 dark:bg-slate-800 overflow-hidden border border-slate-100 shrink-0">
+                                            {student.logoUrl ? <img src={student.logoUrl} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-slate-300 font-bold text-xl">{student.name[0]}</div>}
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-lg text-slate-800 dark:text-white group-hover:text-emerald-700 transition-colors">{student.name}</h3>
+                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider mt-1 ${isActive ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500'}`}>
+                                                {isActive ? 'Plano Ativo' : 'Plano Vencido'}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h3 className="font-bold text-lg text-slate-800 dark:text-white group-hover:text-emerald-700 transition-colors">{student.name}</h3>
-                                        <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider mt-1 ${isActive ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500'}`}>
-                                            {isActive ? 'Plano Ativo' : 'Plano Vencido'}
-                                        </span>
+                                    <div className="flex-1 w-full md:w-auto flex items-center justify-between md:justify-end gap-8 text-sm">
+                                        <div className="text-right hidden sm:block">
+                                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Vencimento</p>
+                                            <p className="font-bold text-slate-700 dark:text-slate-300">
+                                                {student.planEndDate
+                                                    ? student.planEndDate.split('T')[0].split('-').reverse().join('/')
+                                                    : '--'
+                                                }
+                                            </p>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <button onClick={(e) => { e.stopPropagation(); navigate(`/student/${student.id}/edit`); }} className="p-3 rounded-2xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"><Edit2 size={20} /></button>
+                                            <button onClick={(e) => requestDelete(e, student.id)} className="p-3 rounded-2xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"><Trash2 size={20} /></button>
+                                            <ChevronRight size={20} className="text-slate-300 group-hover:text-slate-600" />
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="flex-1 w-full md:w-auto flex items-center justify-between md:justify-end gap-8 text-sm">
-                                    <div className="text-right hidden sm:block">
-                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">Vencimento</p>
-                                        <p className="font-bold text-slate-700 dark:text-slate-300">
-                                            {student.planEndDate
-                                                ? student.planEndDate.split('T')[0].split('-').reverse().join('/')
-                                                : '--'
-                                            }
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <button onClick={(e) => { e.stopPropagation(); navigate(`/student/${student.id}/edit`); }} className="p-3 rounded-2xl text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"><Edit2 size={20} /></button>
-                                        <button onClick={(e) => requestDelete(e, student.id)} className="p-3 rounded-2xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"><Trash2 size={20} /></button>
-                                        <ChevronRight size={20} className="text-slate-300 group-hover:text-slate-600" />
-                                    </div>
-                                </div>
+                            );
+                        })}
+
+                        {totalPages > 1 && (
+                            <div className="flex justify-center items-center gap-4 pt-6">
+                                <button
+                                    onClick={() => setCurrentPage(grep => Math.max(1, grep - 1))}
+                                    disabled={currentPage === 1}
+                                    className="px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-bold disabled:opacity-50 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                                >
+                                    Anterior
+                                </button>
+                                <span className="text-sm font-bold text-slate-500 dark:text-slate-400">
+                                    Página {currentPage} de {totalPages}
+                                </span>
+                                <button
+                                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                    disabled={currentPage === totalPages}
+                                    className="px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-bold disabled:opacity-50 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                                >
+                                    Próxima
+                                </button>
                             </div>
-                        );
-                    })
+                        )}
+                    </>
                 )}
             </div>
 
@@ -279,7 +317,7 @@ export const Dashboard: React.FC = () => {
                         <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">Digite <strong>excluir</strong> para confirmar a remoção definitiva.</p>
                         <input type="text" value={deleteConfirmation} onChange={(e) => setDeleteConfirmation(e.target.value)} placeholder="Digite 'excluir'" className="w-full px-4 py-3 border border-slate-200 rounded-xl mb-4 outline-none focus:border-red-500" />
                         <div className="flex gap-3">
-                            <button onClick={() => setStudentToDelete(null)} className="flex-1 bg-slate-100 py-3 rounded-xl font-bold">Cancelar</button>
+                            <button onClick={() => setStudentToDelete(null)} className="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-white py-3 rounded-xl font-bold transition-colors hover:bg-slate-200 dark:hover:bg-slate-700">Cancelar</button>
                             <button onClick={confirmDelete} disabled={deleteConfirmation.toLowerCase() !== 'excluir' || isDeleting} className="flex-1 bg-red-600 text-white py-3 rounded-xl font-bold disabled:opacity-50">Excluir</button>
                         </div>
                     </div>

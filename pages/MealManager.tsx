@@ -126,7 +126,7 @@ export const MealManager: React.FC = () => {
       </div>
 
       {/* Meal List */}
-      <div className="space-y-4 mb-20">
+      <div className="space-y-4 mb-48 md:mb-24">
         {meals.map((meal) => (
           <div
             key={meal.id}
@@ -192,8 +192,8 @@ export const MealManager: React.FC = () => {
       </div>
 
       {/* Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-4 z-20">
-        <div className="max-w-5xl mx-auto flex justify-end">
+      <div className="fixed bottom-[5.5rem] md:bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 p-4 z-40 md:z-20 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] md:shadow-none">
+        <div className="max-w-5xl mx-auto flex justify-center md:justify-end">
           <button
             onClick={() => {
               if (meals.length === 0) {
@@ -202,7 +202,7 @@ export const MealManager: React.FC = () => {
               }
               navigate(`/student/${studentId}/assessment/${assessmentId}/preview`);
             }}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-emerald-200 dark:shadow-none transition-all active:scale-95"
+            className="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-200 dark:shadow-none transition-all active:scale-95"
           >
             Visualizar e Exportar <ArrowRight size={20} />
           </button>

@@ -110,7 +110,7 @@ export const MealForm: React.FC = () => {
     <Layout title={isEditing ? 'Editar Refeição' : 'Nova Refeição'} showBack backPath={`/student/${studentId}/assessment/${assessmentId}/meals`}>
       <div className="max-w-3xl mx-auto pb-20">
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 border border-white/50 p-8 md:p-10 space-y-10 relative overflow-hidden">
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-white/50 p-8 md:p-10 space-y-10 relative overflow-hidden">
 
           {/* Decorative background blob */}
           <div className="absolute -top-20 -right-20 w-64 h-64 bg-slate-50 rounded-full blur-3xl pointer-events-none opacity-50"></div>
@@ -139,7 +139,7 @@ export const MealForm: React.FC = () => {
                   type="text"
                   value={formData.name}
                   onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full pl-14 pr-6 py-5 bg-slate-50 border-2 border-transparent focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all rounded-3xl font-bold text-lg text-slate-800 placeholder:text-slate-400 outline-none"
+                  className="w-full pl-14 pr-6 py-5 bg-slate-50 border-2 border-transparent focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all rounded-xl font-bold text-lg text-slate-800 placeholder:text-slate-400 outline-none"
                   placeholder="Ex: Café da manhã"
                   required
                 />
@@ -159,7 +159,7 @@ export const MealForm: React.FC = () => {
                       <select
                         value={formData.time}
                         onChange={e => setFormData({ ...formData, time: e.target.value })}
-                        className="w-full pl-14 pr-10 py-5 bg-slate-50 border-2 border-transparent focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all rounded-3xl font-bold text-lg text-slate-800 outline-none appearance-none cursor-pointer"
+                        className="w-full pl-14 pr-10 py-5 bg-slate-50 border-2 border-transparent focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all rounded-xl font-bold text-lg text-slate-800 outline-none appearance-none cursor-pointer"
                         required
                       >
                         <option value="" disabled>Selecione...</option>
@@ -179,7 +179,7 @@ export const MealForm: React.FC = () => {
                       type="time"
                       value={formData.time}
                       onChange={e => setFormData({ ...formData, time: e.target.value })}
-                      className="w-full pl-14 pr-6 py-5 bg-slate-50 border-2 border-transparent focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all rounded-3xl font-bold text-lg text-slate-800 outline-none [color-scheme:light]"
+                      className="w-full pl-14 pr-6 py-5 bg-slate-50 border-2 border-transparent focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all rounded-xl font-bold text-lg text-slate-800 outline-none [color-scheme:light]"
                       required
                     />
                   </>
@@ -306,7 +306,7 @@ export const MealForm: React.FC = () => {
                 <textarea
                   value={formData.description}
                   onChange={e => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-6 py-5 bg-slate-50 border-2 border-transparent focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all rounded-3xl text-slate-700 placeholder:text-slate-400 outline-none resize-none h-32"
+                  className="w-full px-6 py-5 bg-slate-50 border-2 border-transparent focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all rounded-xl text-slate-700 placeholder:text-slate-400 outline-none resize-none h-32"
                   placeholder="Observações adicionais sobre esta refeição (opcional)..."
                 />
               </div>
@@ -316,7 +316,7 @@ export const MealForm: React.FC = () => {
             <div className="pt-6">
               <button
                 type="submit"
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-5 rounded-[2rem] font-bold text-lg shadow-xl shadow-emerald-200 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-5 rounded-2xl font-bold text-lg shadow-xl shadow-emerald-200 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
               >
                 <Save size={24} />
                 Salvar Refeição

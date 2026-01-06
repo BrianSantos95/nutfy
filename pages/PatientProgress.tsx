@@ -142,6 +142,12 @@ export const PatientProgress: React.FC = () => {
 
                 <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
                     <button
+                        onClick={() => navigate(`/student/${studentId}/edit`)}
+                        className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 text-slate-600 dark:text-slate-300 px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm"
+                    >
+                        <Edit2 size={18} /> Editar
+                    </button>
+                    <button
                         onClick={() => setShowRenewModal(true)}
                         className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 text-slate-600 dark:text-slate-300 px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-sm"
                     >

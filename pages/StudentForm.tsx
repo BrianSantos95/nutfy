@@ -147,7 +147,7 @@ export const StudentForm: React.FC = () => {
                 <form onSubmit={handleSubmit} className="space-y-8">
 
                     {/* Bloco 1: Dados Pessoais (Card Principal) */}
-                    <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-8 relative overflow-hidden">
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-8 relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-2 h-full bg-emerald-500"></div>
 
                         <div className="flex items-center gap-3 mb-6">
@@ -228,7 +228,7 @@ export const StudentForm: React.FC = () => {
                     </div>
 
                     {/* Bloco 2: Anamnese (Novo Layout Premium) */}
-                    <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-8 relative overflow-hidden">
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-8 relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
 
                         <div className="flex items-center gap-3 mb-8 border-b border-slate-100 dark:border-slate-800 pb-6">
@@ -385,7 +385,7 @@ export const StudentForm: React.FC = () => {
                     </div>
 
                     {/* Bloco 3: Vigência do Plano */}
-                    <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-8 relative overflow-hidden">
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-8 relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-2 h-full bg-slate-400"></div>
                         <h3 className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-6 flex items-center gap-2">
                             <Clock size={16} /> Configuração do Plano
